@@ -1,58 +1,77 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { MAIN_CATEGORIES, normalize } from "@/lib/categories";
-
-function resolveMainCategory(category, subcategory, object) {
-  const hay = (w) => !!w;
-  const tokens = [category, subcategory, object].filter(hay);
-
-  // Busca la 1ª coincidencia de keyword en cualquiera de los tokens
-  for (const mc of MAIN_CATEGORIES) {
-    for (const kw of mc.keywords) {
-      if (tokens.some((t) => t.includes(kw))) {
-        return mc;
-      }
-    }
-  }
-  // Fallback
-  return { name: "Miscellaneous", slug: "misc", emoji: "✨", color: "#F5F5F5" };
-}
 
 export async function GET() {
   const dir = path.join(process.cwd(), "public/cards");
-  const files = fs.readdirSync(dir).filter((f) => f.toLowerCase().endsWith(".mp4"));
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".mp4"));
+
+  const normalize = (str) =>
+    str
+      ?.toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/&/g, "")
+      .replace(/[^a-z0-9-]/g, "")
+      .trim();
+
+  // 🔹 Diccionario de detección automática
+  const MAIN_MAP = {
+    holidays: ["christmas", "easter", "thanksgiving", "newyear", "july4th", "independenceday", "halloween"],
+    love: ["love", "romance", "anniversary", "wedding", "valentine"],
+    celebrations: ["birthday", "graduation", "mothers-day", "fathers-day", "babyshower", "newborn"],
+    animals: ["dog", "cat", "pets", "petsandanimal", "dogcat", "eagle", "turtle", "yeti"],
+    seasons: ["summer", "spring", "autumn", "winter"],
+  };
+
+  // 🔹 Asocia subcategorías o nombres a una categoría principal
+  function detectMainCategory(word) {
+    word = normalize(word);
+    for (const [main, subs] of Object.entries(MAIN_MAP)) {
+      if (subs.some((s) => word.includes(s))) return main;
+    }
+    return "general";
+  }
 
   const videos = files.map((file) => {
     const clean = file.replace(/\.mp4$/i, "");
-    // Convención: object_category_subcategory_version
-    const [rawObject, rawCategory, rawSubcategory, rawVersion] = clean.split("_");
+    const parts = clean.split("_");
 
-    const object = normalize(rawObject || "unknown");
-    const category = normalize(rawCategory || "general");     // <- tag/tema (ej. halloween)
-    const subcategory = normalize(rawSubcategory || "general");
-    const version = (rawVersion || "").toUpperCase();         // ej. 1A, 2A…
+    // Permite archivos con nombres irregulares o con “sub”, “category”, etc.
+    const object = normalize(parts[0] || "unknown");
+    const possibleCategory = normalize(parts[1] || "");
+    const possibleSub = normalize(parts[2] || "");
+    const version = (parts[3] || "").toUpperCase();
 
-    const main = resolveMainCategory(category, subcategory, object);
+    // Detecta la categoría principal automáticamente
+    const mainCategory = detectMainCategory(possibleCategory || possibleSub);
+
+    // Subcategoría: usa el valor más específico
+    const subcategory = possibleCategory && possibleSub && possibleSub !== "general"
+      ? possibleSub
+      : possibleCategory || "general";
+
+    const mainMeta = {
+      holidays: { name: "Holidays", emoji: "🎄", color: "#FFF4E0" },
+      love: { name: "Love", emoji: "❤️", color: "#FFE8EE" },
+      celebrations: { name: "Celebrations", emoji: "🎉", color: "#FFF7FF" },
+      animals: { name: "Animals & Nature", emoji: "🐾", color: "#E8FFF3" },
+      seasons: { name: "Seasons", emoji: "🍂", color: "#E8F3FF" },
+      general: { name: "General", emoji: "💫", color: "#F5F5F5" },
+    }[mainCategory];
 
     return {
-      // datos originales del archivo
       object,
-      category,        // <- NO es la categoría principal; es el tag (ej. halloween)
+      category: mainCategory, // 💡 categoría principal
       subcategory,
       version,
       src: `/cards/${file}`,
-
-      // metadata de categoría principal para UI/rutas
-      mainName: main.name,
-      mainSlug: main.slug,     // <- usar este slug en /categories/[slug]
-      mainEmoji: main.emoji,
-      mainColor: main.color,
-
-      // título amigable
+      mainName: mainMeta.name,
+      mainSlug: mainCategory,
+      mainEmoji: mainMeta.emoji,
+      mainColor: mainMeta.color,
       title:
         `${object.charAt(0).toUpperCase() + object.slice(1)} ` +
-        `${subcategory !== "general" ? subcategory : category}`,
+        `${subcategory !== "general" ? subcategory : mainMeta.name.toLowerCase()}`,
     };
   });
 
