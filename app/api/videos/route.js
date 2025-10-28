@@ -2,126 +2,140 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-// 🔹 Mapa completo de categorías principales
-const MAIN_MAP = [
-  {
-    name: "Holidays",
-    slug: "holidays",
-    emoji: "🎄",
-    color: "#FFF4E0",
-    subcategories: [
-      "christmas", "xmas", "thanksgiving", "newyear", "newyears",
-      "easter", "halloween", "july4th", "independenceday", "memorialday",
-      "laborday", "veteransday", "presidentsday", "holidayseason",
-      "hanukkah", "kwanzaa", "springfestival", "winterfest", "carnival",
-      "fireworks", "parade", "patriotic"
-    ]
+// 🌎 CATEGORÍAS Y SUBCATEGORÍAS COMBINADAS AUTOMÁTICAMENTE
+const MAIN_GROUPS = {
+  holidays: {
+    mainName: "Holidays",
+    mainEmoji: "🎄",
+    mainColor: "#FFF4E0",
+    keywords: [
+      // 🔹 USA + global
+      "christmas", "halloween", "thanksgiving", "easter", "newyear",
+      "independenceday", "july4th", "fourthofjuly", "fireworks",
+      "memorialday", "veteransday", "presidentsday", "laborday",
+      "mlkday", "columbusday", "flagday", "patriotsday",
+      "cinco", "cincodemayo", "oktoberfest", "stpatrick", "stpatricksday",
+      "earthday", "kindnessday", "friendshipday", "womensday", "workersday",
+      "heritagemonth", "dayofthedead", "holiday", "holidayseason",
+      "diwali", "hanukkah", "boxingday", "carnival", "thankful",
+      "turkeyday", "pumpkin", "santa"
+    ],
   },
-  {
-    name: "Love",
-    slug: "love",
-    emoji: "❤️",
-    color: "#FFE8EE",
-    subcategories: [
-      "romance", "romantic", "anniversary", "wedding", "engagement",
-      "proposal", "couple", "valentine", "valentines", "love-story",
-      "union", "affection", "sweetheart", "relationship", "hugs",
-      "kiss", "together", "commitment"
-    ]
+
+  love: {
+    mainName: "Love",
+    mainEmoji: "❤️",
+    mainColor: "#FFE8EE",
+    keywords: [
+      "valentine", "romance", "anniversary", "wedding", "engagement",
+      "proposal", "couple", "relationship", "heart", "kiss",
+      "marriage", "love", "partner", "girlfriend", "boyfriend",
+      "crush", "affection", "date", "forever", "sweetheart"
+    ],
   },
-  {
-    name: "Celebrations",
-    slug: "celebrations",
-    emoji: "🎉",
-    color: "#FFF7FF",
-    subcategories: [
-      "birthday", "birthdays", "graduation", "graduate", "promotion",
-      "achievement", "baby", "babyshower", "newborn", "mothers-day",
-      "fathers-day", "friendship-day", "appreciationday", "retirement",
-      "farewell", "welcome", "party", "milestone", "success",
-      "congratulations", "reunion", "cheer", "toast"
-    ]
+
+  celebrations: {
+    mainName: "Celebrations",
+    mainEmoji: "🎉",
+    mainColor: "#FFF7FF",
+    keywords: [
+      "birthday", "graduation", "babyshower", "mothersday", "fathersday",
+      "retirement", "party", "event", "achievement", "success",
+      "promotion", "newjob", "newhome", "moving", "bridalshower",
+      "babyarrival", "genderreveal", "welcome", "farewell", "anniversaryparty"
+    ],
   },
-  {
-    name: "Animals & Nature",
-    slug: "animals",
-    emoji: "🐾",
-    color: "#E8FFF3",
-    subcategories: [
-      "dog", "dogs", "cat", "cats", "pets", "petsandanimal", "wildlife",
-      "bird", "birds", "eagle", "turtle", "unicorn", "panda", "bear",
-      "elephant", "butterfly", "fox", "lion", "tiger", "monkey", "bunny",
-      "rabbit", "horse", "bee", "fish", "ocean", "forest", "nature",
-      "flowers", "tree", "earthday", "environment", "eco"
-    ]
+
+  animals: {
+    mainName: "Animals & Nature",
+    mainEmoji: "🐾",
+    mainColor: "#E8FFF3",
+    keywords: [
+      "pets", "petsandanimal", "dog", "cat", "puppy", "kitten",
+      "horse", "bird", "wildlife", "eagle", "forest", "nature",
+      "butterfly", "fish", "turtle", "bunny", "elephant", "lion",
+      "tiger", "bear", "rabbit", "dolphin", "animal", "zoo",
+      "sea", "flower", "tree", "bee", "sunflower"
+    ],
   },
-  {
-    name: "Seasons",
-    slug: "seasons",
-    emoji: "🍂",
-    color: "#FFEFD6",
-    subcategories: [
-      "spring", "summer", "autumn", "fall", "winter", "rainyday", "snowyday",
-      "sunnyday", "breezy", "stormy", "cloudy", "sunrise", "sunset", "beach",
-      "leaves", "blossom", "frost", "sunshine", "harvest", "vacation", "holiday"
-    ]
+
+  seasons: {
+    mainName: "Seasons",
+    mainEmoji: "🍂",
+    mainColor: "#FFF4E0",
+    keywords: [
+      "spring", "summer", "autumn", "fall", "winter", "season",
+      "rainy", "rain", "snow", "cold", "heat", "beach", "sunny",
+      "sunset", "leaves", "flowers", "vacation", "travel", "mountain"
+    ],
   },
-  {
-    name: "Support & Care",
-    slug: "support",
-    emoji: "🕊️",
-    color: "#F3F3F3",
-    subcategories: [
-      "condolence", "sympathy", "loss", "memorial", "remembrance",
-      "healing", "getwell", "wellness", "peace", "comfort", "hope",
-      "care", "kindness", "compassion", "gratitude", "thankyou",
-      "support", "recovery", "patience", "courage", "empathy",
-      "friendship", "cheerup", "staystrong", "positivevibes"
-    ]
-  }
-];
+
+  appreciation: {
+    mainName: "Appreciation & Support",
+    mainEmoji: "💌",
+    mainColor: "#FDE6E6",
+    keywords: [
+      "thankyou", "appreciation", "condolences", "healing", "getwell",
+      "support", "care", "teacher", "nurse", "doctor", "gratitude",
+      "friendship", "help", "motivational", "inspiration",
+      "encouragement", "thank", "hero", "community", "worker",
+      "mentor", "helper", "volunteer", "thanks"
+    ],
+  },
+};
+
+// 🔹 Normaliza texto
+function normalize(str) {
+  return str
+    ?.toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9-]/g, "")
+    .trim();
+}
 
 export async function GET() {
   const dir = path.join(process.cwd(), "public/cards");
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".mp4"));
-
-  // 🔹 Normaliza texto
-  const normalize = (str) =>
-    str
-      ?.toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/&/g, "")
-      .replace(/[^a-z0-9-]/g, "")
-      .trim();
+  const files = fs.existsSync(dir)
+    ? fs.readdirSync(dir).filter((f) => f.endsWith(".mp4"))
+    : [];
 
   const videos = files.map((file) => {
     const cleanName = file.replace(".mp4", "");
     const parts = cleanName.split("_");
 
-    // Estructura base: object_category_subcategory_version
+    // Estructura: object_category_subcategory_version
     const object = parts[0] || "unknown";
-    const category = parts[1] || "general";
-    const subcategory = parts[2] || "general";
+    const category = normalize(parts[1] || "general");
+    const subcategory = normalize(parts[2] || "general");
 
-    // 🔹 Detectar categoría principal automáticamente
-    const main =
-      MAIN_MAP.find((m) =>
-        m.subcategories.some((s) => cleanName.toLowerCase().includes(s))
-      ) || MAIN_MAP[0];
+    // 🔍 Clasificación inteligente por coincidencia parcial
+    const match = Object.entries(MAIN_GROUPS).find(([key, group]) =>
+      group.keywords.some((kw) => cleanName.includes(kw))
+    );
+
+    const [selectedKey, selectedGroup] = match || ["appreciation", MAIN_GROUPS.appreciation];
+
+    // 🧠 Combinación automática de nombres
+    const fullCategoryName = `${selectedGroup.mainName} — ${subcategory !== "general" ? subcategory : category}`.replace(/-/g, " ");
 
     return {
-      title:
-        `${object.charAt(0).toUpperCase() + object.slice(1)} ${category}`.trim(),
+      // 🌸 Primero categoría principal
+      mainName: selectedGroup.mainName,
+      mainEmoji: selectedGroup.mainEmoji,
+      mainColor: selectedGroup.mainColor,
+
+      // 🧩 Luego datos combinados y limpios
       object,
-      category: normalize(category),
-      subcategory: normalize(subcategory),
-      mainName: main.name,
-      mainSlug: main.slug,
-      mainEmoji: main.emoji,
-      mainColor: main.color,
+      category,
+      subcategory,
+      combinedName: fullCategoryName,
       src: `/cards/${file}`,
+
+      // 🔗 Slug técnico
+      mainSlug: selectedKey,
     };
   });
 
   return NextResponse.json({ videos });
-  }
+      }
