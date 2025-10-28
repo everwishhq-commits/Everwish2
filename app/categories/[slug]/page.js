@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { categories } from "@/lib/categories";
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -9,8 +10,12 @@ export default function CategoryPage() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const normalize = (str) =>
-    str?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "").trim();
+  const userLang =
+    typeof navigator !== "undefined" && navigator.language.startsWith("es");
+
+  function normalize(str) {
+    return str?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "").trim();
+  }
 
   useEffect(() => {
     async function loadVideos() {
@@ -18,11 +23,16 @@ export default function CategoryPage() {
         const res = await fetch("/api/videos", { cache: "no-store" });
         const data = await res.json();
         const all = data.videos || [];
-        const filtered = all.filter(
-          (v) => normalize(v.category) === normalize(slug)
-        );
+
+        const currentCat = categories.find((c) => c.slug === slug);
+        if (!currentCat) return;
+
+        const filtered = all.filter((v) => {
+          const base = v.src.split("_").slice(0, -1).join("_").toLowerCase();
+          return currentCat.keywords.some((k) => base.includes(k));
+        });
+
         setVideos(filtered);
-        console.log("✅ Videos cargados para:", slug, filtered);
       } catch (err) {
         console.error("Error loading videos:", err);
       } finally {
@@ -33,26 +43,32 @@ export default function CategoryPage() {
   }, [slug]);
 
   if (loading)
-    return (
-      <p className="text-center text-gray-400 mt-10">Loading cards...</p>
-    );
+    return <p className="text-center text-gray-400 mt-10">Loading...</p>;
+
+  const category = categories.find((c) => c.slug === slug);
+  const displayName = userLang ? category?.name_es : category?.name_en;
 
   return (
-    <main className="min-h-screen bg-[#fff5f8] text-gray-800 flex flex-col items-center py-10 px-4">
+    <main
+      className="min-h-screen text-gray-800 flex flex-col items-center py-10 px-4"
+      style={{ backgroundColor: category?.color || "#fff5f8" }}
+    >
       <button
         onClick={() => router.push("/")}
         className="mb-6 text-pink-600 hover:underline"
       >
-        ← Back to Home
+        ← {userLang ? "Volver al inicio" : "Back to Home"}
       </button>
 
-      <h1 className="text-3xl font-extrabold text-pink-600 mb-6 capitalize text-center">
-        {slug.replace(/-/g, " ")} Cards ✨
+      <h1 className="text-3xl font-extrabold mb-8 capitalize text-center text-pink-600">
+        {displayName}
       </h1>
 
       {videos.length === 0 ? (
         <p className="text-center text-gray-500">
-          No cards available in this category yet ✨
+          {userLang
+            ? "No hay videos en esta categoría aún ✨"
+            : "No cards available in this category yet ✨"}
         </p>
       ) : (
         <div className="flex flex-wrap justify-center gap-8 max-w-6xl">
@@ -73,7 +89,9 @@ export default function CategoryPage() {
                 onError={(e) => (e.target.poster = "/placeholder.png")}
               />
               <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-700 mb-1">{v.title}</h3>
+                <h3 className="font-semibold text-gray-700 mb-1">
+                  {v.title}
+                </h3>
                 <p className="text-sm text-gray-500">
                   {v.subcategory || "General"}
                 </p>
@@ -84,4 +102,4 @@ export default function CategoryPage() {
       )}
     </main>
   );
-        }
+}
