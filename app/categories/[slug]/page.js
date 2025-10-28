@@ -1,21 +1,28 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 export default function CategoryPage() {
   const { slug } = useParams();
+  const router = useRouter();
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Normaliza las categorías (ej: "Love & Romance" → "love-romance")
+  const normalize = (str) =>
+    str?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and").trim();
 
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch("/api/videos");
+        const res = await fetch("/api/videos", { cache: "no-store" });
         const data = await res.json();
-        const categoryName = slug.replace(/-/g, " ");
-        const filtered = data.videos.filter(
-          (v) => v.category?.toLowerCase() === categoryName.toLowerCase()
+        const all = data.videos || [];
+
+        // Filtrar por categoría actual
+        const filtered = all.filter(
+          (v) => normalize(v.category) === normalize(slug)
         );
         setVideos(filtered);
       } catch (err) {
@@ -32,8 +39,15 @@ export default function CategoryPage() {
 
   return (
     <main className="min-h-screen bg-[#fff5f8] text-gray-800 flex flex-col items-center py-10 px-4">
+      <button
+        onClick={() => router.push("/")}
+        className="mb-6 text-pink-600 hover:underline"
+      >
+        ← Back to Home
+      </button>
+
       <h1 className="text-3xl font-extrabold text-pink-600 mb-6 capitalize text-center">
-        {slug.replace(/-/g, " ")}
+        {slug.replace(/-/g, " ")} Cards ✨
       </h1>
 
       <div className="flex flex-wrap justify-center gap-8 max-w-6xl">
@@ -52,6 +66,7 @@ export default function CategoryPage() {
                 loop
                 playsInline
                 autoPlay
+                onError={(e) => (e.target.poster = "/placeholder.png")}
               />
               <p className="text-center mt-2 text-gray-700 font-semibold truncate">
                 {v.title}
