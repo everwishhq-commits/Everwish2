@@ -1,5 +1,7 @@
+import "./globals.css";
+
 export const metadata = {
-  title: "Everwish2",
+  title: "Everwish",
   description: "Share moments that last forever ✨",
 };
 
@@ -16,7 +18,18 @@ export default function RootLayout({ children }) {
         }}
       >
         {children}
+        <footer
+          style={{
+            textAlign: "center",
+            fontSize: "0.9rem",
+            marginTop: "4rem",
+            padding: "1rem 0",
+            color: "#777",
+          }}
+        >
+          © 2025 <strong>Everwish</strong> · Share your moments with love 💌
+        </footer>
       </body>
     </html>
   );
-}
+            }
