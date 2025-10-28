@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { MAIN_MAP } from "@/lib/categoriesMap";
 
 export async function GET() {
   const dir = path.join(process.cwd(), "public/cards");
   const files = fs.readdirSync(dir).filter((f) => f.endsWith(".mp4"));
 
+  // Normaliza texto para comparación
   const normalize = (str) =>
     str
       ?.toLowerCase()
@@ -14,64 +16,32 @@ export async function GET() {
       .replace(/[^a-z0-9-]/g, "")
       .trim();
 
-  // 🔹 Diccionario de detección automática
-  const MAIN_MAP = {
-    holidays: ["christmas", "easter", "thanksgiving", "newyear", "july4th", "independenceday", "halloween"],
-    love: ["love", "romance", "anniversary", "wedding", "valentine"],
-    celebrations: ["birthday", "graduation", "mothers-day", "fathers-day", "babyshower", "newborn"],
-    animals: ["dog", "cat", "pets", "petsandanimal", "dogcat", "eagle", "turtle", "yeti"],
-    seasons: ["summer", "spring", "autumn", "winter"],
-  };
-
-  // 🔹 Asocia subcategorías o nombres a una categoría principal
-  function detectMainCategory(word) {
-    word = normalize(word);
-    for (const [main, subs] of Object.entries(MAIN_MAP)) {
-      if (subs.some((s) => word.includes(s))) return main;
-    }
-    return "general";
-  }
-
   const videos = files.map((file) => {
-    const clean = file.replace(/\.mp4$/i, "");
-    const parts = clean.split("_");
+    const cleanName = file.replace(".mp4", "");
+    const parts = cleanName.split("_");
 
-    // Permite archivos con nombres irregulares o con “sub”, “category”, etc.
-    const object = normalize(parts[0] || "unknown");
-    const possibleCategory = normalize(parts[1] || "");
-    const possibleSub = normalize(parts[2] || "");
-    const version = (parts[3] || "").toUpperCase();
+    // Estructura: object_category_subcategory_version
+    const object = parts[0] || "unknown";
+    const category = parts[1] || "general";
+    const subcategory = parts[2] || "general";
 
-    // Detecta la categoría principal automáticamente
-    const mainCategory = detectMainCategory(possibleCategory || possibleSub);
-
-    // Subcategoría: usa el valor más específico
-    const subcategory = possibleCategory && possibleSub && possibleSub !== "general"
-      ? possibleSub
-      : possibleCategory || "general";
-
-    const mainMeta = {
-      holidays: { name: "Holidays", emoji: "🎄", color: "#FFF4E0" },
-      love: { name: "Love", emoji: "❤️", color: "#FFE8EE" },
-      celebrations: { name: "Celebrations", emoji: "🎉", color: "#FFF7FF" },
-      animals: { name: "Animals & Nature", emoji: "🐾", color: "#E8FFF3" },
-      seasons: { name: "Seasons", emoji: "🍂", color: "#E8F3FF" },
-      general: { name: "General", emoji: "💫", color: "#F5F5F5" },
-    }[mainCategory];
+    // Buscar coincidencia automática en MAIN_MAP
+    const main =
+      MAIN_MAP.find((m) =>
+        m.subcategories.some((s) => cleanName.toLowerCase().includes(s))
+      ) || MAIN_MAP[0];
 
     return {
-      object,
-      category: mainCategory, // 💡 categoría principal
-      subcategory,
-      version,
-      src: `/cards/${file}`,
-      mainName: mainMeta.name,
-      mainSlug: mainCategory,
-      mainEmoji: mainMeta.emoji,
-      mainColor: mainMeta.color,
       title:
-        `${object.charAt(0).toUpperCase() + object.slice(1)} ` +
-        `${subcategory !== "general" ? subcategory : mainMeta.name.toLowerCase()}`,
+        `${object.charAt(0).toUpperCase() + object.slice(1)} ${category}`.trim(),
+      object,
+      category: normalize(category),
+      subcategory: normalize(subcategory),
+      mainName: main.name,
+      mainSlug: main.slug,
+      mainEmoji: main.emoji,
+      mainColor: main.color,
+      src: `/cards/${file}`,
     };
   });
 
