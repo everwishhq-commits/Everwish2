@@ -9,7 +9,7 @@ export default function CategoryPage() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Normaliza los nombres (por ejemplo: "Love & Romance" → "love-romance")
+  // Normaliza el slug: "Love & Romance" → "love-romance"
   const normalize = (str) =>
     str?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and").trim();
 
@@ -20,7 +20,6 @@ export default function CategoryPage() {
         const data = await res.json();
         const all = data.videos || [];
 
-        // Filtrar los videos que correspondan a esta categoría
         const filtered = all.filter(
           (v) => normalize(v.category) === normalize(slug)
         );
@@ -32,11 +31,15 @@ export default function CategoryPage() {
         setLoading(false);
       }
     }
+
     loadVideos();
   }, [slug]);
 
-  if (loading)
-    return <p className="text-center text-gray-400 mt-10">Loading videos...</p>;
+  if (loading) {
+    return (
+      <p className="text-center text-gray-400 mt-10">Loading videos...</p>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#fff5f8] text-gray-800 flex flex-col items-center py-10 px-4">
@@ -51,7 +54,7 @@ export default function CategoryPage() {
         {slug.replace(/-/g, " ")} Cards ✨
       </h1>
 
-      {videos.length ? (
+      {videos.length > 0 ? (
         <div className="flex flex-wrap justify-center gap-8 max-w-6xl">
           {videos.map((v, i) => (
             <motion.div
@@ -87,4 +90,4 @@ export default function CategoryPage() {
       )}
     </main>
   );
-    }
+          }
