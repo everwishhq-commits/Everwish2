@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import Top10Carousel from "@/components/Top10Carousel";
-import CategoriesCarousel from "@/components/CategoriesCarousel";
+import Top10Carousel from "../components/Top10Carousel";
+import CategoriesCarousel from "../components/CategoriesCarousel";
 
 export default function HomePage() {
   const [videos, setVideos] = useState([]);
