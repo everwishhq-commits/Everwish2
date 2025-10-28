@@ -7,29 +7,14 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        style={{
-          backgroundColor: "#fff5f8",
-          color: "#333",
-          fontFamily: "system-ui, sans-serif",
-          margin: 0,
-          padding: 0,
-        }}
-      >
-        {children}
-        <footer
-          style={{
-            textAlign: "center",
-            fontSize: "0.9rem",
-            marginTop: "4rem",
-            padding: "1rem 0",
-            color: "#777",
-          }}
-        >
-          © 2025 <strong>Everwish</strong> · Share your moments with love 💌
+    <html lang="en" suppressHydrationWarning>
+      <body className="bg-[#fff5f8] text-[#333] font-sans m-0 p-0 min-h-screen">
+        <main className="min-h-screen">{children}</main>
+
+        <footer className="text-center text-sm text-gray-500 mt-10 py-6 border-t border-pink-100">
+          © 2025 <strong className="text-pink-600">Everwish</strong> · Share your moments with love 💌
         </footer>
       </body>
     </html>
   );
-            }
+}
