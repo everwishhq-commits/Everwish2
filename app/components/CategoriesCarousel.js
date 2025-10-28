@@ -33,6 +33,7 @@ export default function CategoriesCarousel() {
       <h2 className="text-2xl font-bold text-pink-600 mb-4 text-center">
         🎨 Explore Categories
       </h2>
+
       <div className="flex justify-center mb-6">
         <input
           type="text"
