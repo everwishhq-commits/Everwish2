@@ -9,9 +9,9 @@ export default function CategoryPage() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Normaliza el slug: "Love & Romance" → "love-romance"
+  // 🔹 Normaliza igual que el backend
   const normalize = (str) =>
-    str?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and").trim();
+    str?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "").trim();
 
   useEffect(() => {
     async function loadVideos() {
@@ -26,7 +26,7 @@ export default function CategoryPage() {
 
         setVideos(filtered);
       } catch (err) {
-        console.error("⚠️ Error cargando videos:", err);
+        console.error("Error loading category:", err);
       } finally {
         setLoading(false);
       }
@@ -35,11 +35,10 @@ export default function CategoryPage() {
     loadVideos();
   }, [slug]);
 
-  if (loading) {
+  if (loading)
     return (
-      <p className="text-center text-gray-400 mt-10">Loading videos...</p>
+      <p className="text-center text-gray-400 mt-10">Loading cards...</p>
     );
-  }
 
   return (
     <main className="min-h-screen bg-[#fff5f8] text-gray-800 flex flex-col items-center py-10 px-4">
@@ -50,11 +49,15 @@ export default function CategoryPage() {
         ← Back to Home
       </button>
 
-      <h1 className="text-3xl font-extrabold text-pink-600 mb-8 capitalize text-center">
+      <h1 className="text-3xl font-extrabold text-pink-600 mb-6 capitalize text-center">
         {slug.replace(/-/g, " ")} Cards ✨
       </h1>
 
-      {videos.length > 0 ? (
+      {videos.length === 0 ? (
+        <p className="text-center text-gray-500">
+          No cards available in this category yet ✨
+        </p>
+      ) : (
         <div className="flex flex-wrap justify-center gap-8 max-w-6xl">
           {videos.map((v, i) => (
             <motion.div
@@ -64,15 +67,12 @@ export default function CategoryPage() {
               className="bg-white rounded-3xl shadow-md border border-pink-100 hover:border-pink-200 hover:bg-pink-50 p-4 w-64 cursor-pointer"
             >
               <video
-                src={v.src.startsWith("/cards/") ? v.src : `/cards/${v.src}`}
+                src={v.src}
                 className="w-full h-48 object-cover rounded-2xl bg-black"
                 muted
                 loop
                 playsInline
                 autoPlay
-                onError={(e) => {
-                  e.target.poster = "/placeholder.png";
-                }}
               />
               <div className="p-4 text-center">
                 <h3 className="font-semibold text-gray-700 mb-1">{v.title}</h3>
@@ -83,11 +83,7 @@ export default function CategoryPage() {
             </motion.div>
           ))}
         </div>
-      ) : (
-        <p className="text-gray-400 text-center mt-10">
-          No cards available in this category yet ✨
-        </p>
       )}
     </main>
   );
-          }
+                  }
