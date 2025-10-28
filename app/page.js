@@ -1,61 +1,56 @@
 "use client";
-import { useEffect, useState } from "react";
-import Top10Carousel from "../components/Top10Carousel";
-import CategoriesCarousel from "../components/CategoriesCarousel";
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
-  const [videos, setVideos] = useState([]);
+import { useState } from "react";
+import Header from "@/components/header";
+import Carousel from "@/components/carousel";
+import Categories from "@/components/categories";
+import Footer from "@/components/footer";
+import Splash from "@/components/splash";
+
+export default function Page() {
   const [loading, setLoading] = useState(true);
 
-  // 🎥 Cargar videos desde /api/videos
-  useEffect(() => {
-    async function loadVideos() {
-      try {
-        const res = await fetch("/api/videos", { cache: "no-store" });
-        const data = await res.json();
-        setVideos(data.videos || []);
-      } catch (err) {
-        console.error("❌ Error loading videos:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadVideos();
-  }, []);
-
-  if (loading) {
-    return (
-      <main className="min-h-screen flex flex-col justify-center items-center text-gray-500">
-        <p>Loading Everwish cards...</p>
-      </main>
-    );
-  }
-
   return (
-    <main
-      className="min-h-screen flex flex-col items-center text-gray-800 pt-10 pb-20 px-4"
-      style={{
-        background:
-          "linear-gradient(to bottom, #fff5f8 0%, #fff8fa 40%, #ffffff 100%)",
-      }}
-    >
-      {/* 🌸 Encabezado */}
-      <h1 className="text-4xl font-extrabold text-pink-600 mb-4 text-center">
-        💌 Everwish Moments
-      </h1>
-      <p className="text-gray-600 text-center mb-10 max-w-xl">
-        Discover digital cards full of joy, love, and celebration ✨
-      </p>
+    <>
+      {/* 🩷 Splash inicial Everwish */}
+      {loading && <Splash onFinish={() => setLoading(false)} />}
 
-      {/* 🏆 Carrusel principal */}
-      <section className="w-full max-w-5xl mb-16">
-        <Top10Carousel videos={videos} />
-      </section>
+      {/* 🌸 Contenido principal */}
+      {!loading && (
+        <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#fff5f7] via-[#fff8f9] to-white text-gray-700">
+          {/* 🔝 Encabezado */}
+          <Header />
 
-      {/* 📦 Carrusel de categorías */}
-      <section className="w-full max-w-6xl">
-        <CategoriesCarousel videos={videos} />
-      </section>
-    </main>
+          {/* 🏠 Sección principal */}
+          <main className="flex flex-col items-center justify-start flex-1 w-full pt-20 px-4 text-center">
+            {/* ✨ Texto principal */}
+            <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-gray-800">
+              Share moments that last forever 💫
+            </h1>
+            <p className="text-gray-500 mb-10 max-w-lg">
+              With <b className="text-pink-500">Everwish</b>, every card becomes
+              a memory you can relive.
+            </p>
+
+            {/* 🎞️ Carrusel principal */}
+            <div className="w-full max-w-4xl mb-12">
+              <Carousel />
+            </div>
+
+            {/* 🧩 Categorías */}
+            <section className="w-full bg-white rounded-3xl shadow-lg border border-pink-100 px-4 py-6 mb-12">
+              <h2 className="text-2xl font-semibold mb-6 text-pink-600">
+                Explore Categories ✨
+              </h2>
+              <Categories />
+            </section>
+          </main>
+
+          {/* 👣 Footer Everwish */}
+          <Footer />
+        </div>
+      )}
+    </>
   );
-}
+              }
