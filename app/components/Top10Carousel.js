@@ -1,44 +1,35 @@
 "use client";
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-export default function Top10Carousel({ search }) {
-  const [videos, setVideos] = useState([]);
-
-  useEffect(() => {
-    fetch("/api/videos")
-      .then((res) => res.json())
-      .then((data) => setVideos(data.videos.slice(0, 10)));
-  }, []);
-
-  const filtered = videos.filter(
-    (v) =>
-      v.title.toLowerCase().includes(search.toLowerCase()) ||
-      v.category.toLowerCase().includes(search.toLowerCase()) ||
-      v.subcategory.toLowerCase().includes(search.toLowerCase())
-  );
-
-  if (filtered.length === 0)
-    return <p className="text-gray-400 text-center">No cards found.</p>;
+export default function Top10Carousel({ videos = [] }) {
+  if (!videos.length) return null;
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-      {filtered.map((v, i) => (
-        <motion.div
-          key={i}
-          whileHover={{ scale: 1.05 }}
-          className="min-w-[200px] bg-white shadow rounded-2xl overflow-hidden snap-center"
-        >
-          <video
-            src={v.src}
-            className="object-cover w-full aspect-[4/5]"
-            playsInline
-            loop
-            muted
-          />
-          <p className="text-center py-2 text-gray-700 font-semibold">{v.title}</p>
-        </motion.div>
-      ))}
-    </div>
+    <section>
+      <h2 className="text-2xl font-bold text-pink-600 mb-4 text-center">
+        🌟 Top 10 Trending
+      </h2>
+      <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide">
+        {videos.map((v, i) => (
+          <motion.div
+            key={i}
+            whileHover={{ scale: 1.05 }}
+            className="min-w-[220px] bg-white rounded-3xl shadow-md border border-pink-100 hover:border-pink-200 p-4 flex-shrink-0 text-center"
+          >
+            <video
+              src={v.url}
+              className="rounded-xl w-full h-40 object-cover mb-2"
+              controls={false}
+              autoPlay
+              loop
+              muted
+            />
+            <p className="text-gray-700 font-semibold capitalize">
+              {v.title || v.slug.replace(/-/g, " ")}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+    </section>
   );
-              }
+                }
