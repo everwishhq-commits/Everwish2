@@ -9,7 +9,7 @@ export default function CategoryPage() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Normaliza igual que el backend
+  // 🔹 Misma función normalize que en el backend
   const normalize = (str) =>
     str?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "").trim();
 
@@ -20,13 +20,15 @@ export default function CategoryPage() {
         const data = await res.json();
         const all = data.videos || [];
 
+        // Filtrar por categoría normalizada
         const filtered = all.filter(
           (v) => normalize(v.category) === normalize(slug)
         );
 
         setVideos(filtered);
+        console.log("✅ Videos cargados para categoría:", slug, filtered);
       } catch (err) {
-        console.error("Error loading category:", err);
+        console.error("Error loading videos:", err);
       } finally {
         setLoading(false);
       }
@@ -73,6 +75,9 @@ export default function CategoryPage() {
                 loop
                 playsInline
                 autoPlay
+                onError={(e) => {
+                  e.target.poster = "/placeholder.png";
+                }}
               />
               <div className="p-4 text-center">
                 <h3 className="font-semibold text-gray-700 mb-1">{v.title}</h3>
