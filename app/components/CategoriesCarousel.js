@@ -1,6 +1,5 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
@@ -13,10 +12,9 @@ export default function CategoriesCarousel() {
     async function load() {
       const res = await fetch("/api/videos");
       const data = await res.json();
-
-      // Agrupar categorías únicas
+      // Extraer categorías únicas
       const uniqueCategories = [
-        ...new Set(data.videos.map((v) => v.category)),
+        ...new Set(data.videos.map((v) => v.category.trim())),
       ];
       setCategories(uniqueCategories);
     }
@@ -31,41 +29,51 @@ export default function CategoriesCarousel() {
     return <p className="text-center text-gray-400">Loading categories...</p>;
 
   return (
-    <div className="w-full flex flex-col items-center">
-      <input
-        type="text"
-        placeholder="Search category..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full max-w-sm mb-6 rounded-full border border-pink-200 bg-white/70 px-4 py-3 text-center shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300"
-      />
-      <div className="flex overflow-x-auto space-x-6 no-scrollbar snap-x snap-mandatory">
+    <section className="px-4 py-8">
+      <h2 className="text-2xl font-bold text-pink-600 mb-4 text-center">
+        🎨 Explore Categories
+      </h2>
+      <div className="flex justify-center mb-6">
+        <input
+          type="text"
+          placeholder="Search category..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="rounded-full border border-pink-200 bg-white/70 px-4 py-2 text-center shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 w-64"
+        />
+      </div>
+
+      <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide justify-start px-2">
         {filtered.map((cat, i) => (
           <motion.div
             key={i}
             whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+            className="min-w-[180px] bg-white rounded-3xl shadow-md border border-pink-100 hover:border-pink-200 hover:bg-pink-50 p-5 flex-shrink-0 text-center cursor-pointer"
             onClick={() =>
               router.push(`/categories/${cat.toLowerCase().replace(/\s+/g, "-")}`)
             }
-            className="cursor-pointer min-w-[160px] bg-white rounded-2xl shadow-md border border-pink-100 p-6 text-center snap-start"
           >
-            <span className="text-3xl mb-2 block">
-              {getEmojiForCategory(cat)}
-            </span>
+            <span className="text-3xl mb-2 block">{getEmojiForCategory(cat)}</span>
             <p className="font-semibold text-gray-700 capitalize">{cat}</p>
           </motion.div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
 function getEmojiForCategory(name) {
   const map = {
-    "Seasonal Holidays": "🎄",
-    "Love & Romance": "💘",
-    Birthday: "🎂",
-    Animals: "🐾",
+    halloween: "🎃",
+    christmas: "🎄",
+    "mothers-day": "💐",
+    "independenceday": "🦅",
+    anniversary: "💞",
+    thanksgiving: "🦃",
+    easter: "🐰",
+    love: "💘",
+    petsandanimals: "🐾",
   };
-  return map[name] || "✨";
-}
+  return map[name.toLowerCase()] || "✨";
+            }
