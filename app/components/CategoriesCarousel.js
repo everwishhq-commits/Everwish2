@@ -77,4 +77,4 @@ function getEmojiForCategory(name) {
     petsandanimals: "🐾",
   };
   return map[name.toLowerCase()] || "✨";
-            }
+}
