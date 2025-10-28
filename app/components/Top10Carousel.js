@@ -1,35 +1,48 @@
 "use client";
+
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-export default function Top10Carousel({ videos = [] }) {
-  if (!videos.length) return null;
+export default function Top10Carousel() {
+  const [videos, setVideos] = useState([]);
+
+  useEffect(() => {
+    async function load() {
+      const res = await fetch("/api/videos");
+      const data = await res.json();
+      setVideos(data.videos.slice(0, 10)); // top 10
+    }
+    load();
+  }, []);
+
+  if (!videos.length) {
+    return <p className="text-center text-gray-400">Loading top videos...</p>;
+  }
 
   return (
-    <section>
-      <h2 className="text-2xl font-bold text-pink-600 mb-4 text-center">
-        🌟 Top 10 Trending
-      </h2>
-      <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide">
-        {videos.map((v, i) => (
-          <motion.div
-            key={i}
-            whileHover={{ scale: 1.05 }}
-            className="min-w-[220px] bg-white rounded-3xl shadow-md border border-pink-100 hover:border-pink-200 p-4 flex-shrink-0 text-center"
-          >
-            <video
-              src={v.url}
-              className="rounded-xl w-full h-40 object-cover mb-2"
-              controls={false}
-              autoPlay
-              loop
-              muted
-            />
-            <p className="text-gray-700 font-semibold capitalize">
-              {v.title || v.slug.replace(/-/g, " ")}
+    <div className="flex overflow-x-auto space-x-6 p-2 no-scrollbar justify-start snap-x snap-mandatory">
+      {videos.map((v, i) => (
+        <motion.div
+          key={i}
+          whileHover={{ scale: 1.05 }}
+          className="min-w-[250px] bg-white rounded-2xl shadow-md border border-pink-100 snap-start"
+        >
+          <video
+            src={v.src}
+            className="w-full h-48 object-cover rounded-t-2xl"
+            muted
+            loop
+            playsInline
+            autoPlay
+          />
+          <div className="p-4 text-center">
+            <h3 className="font-semibold text-pink-600 text-lg">{v.title}</h3>
+            <p className="text-sm text-gray-500 capitalize">
+              {v.category} · {v.subcategory}
             </p>
-          </motion.div>
-        ))}
-      </div>
-    </section>
+          </div>
+        </motion.div>
+      ))}
+    </div>
   );
-                }
+              }
