@@ -28,15 +28,13 @@ export default function HomePage() {
         Discover digital cards full of joy, love, and celebration ✨
       </p>
 
-      {/* 🏆 Carrusel Top 10 */}
       <section className="w-full max-w-6xl mb-16">
         <Top10Carousel videos={videos} />
       </section>
 
-      {/* 🎨 Carrusel Categorías */}
       <section className="w-full max-w-6xl">
         <CategoriesCarousel videos={videos} />
       </section>
     </main>
   );
-        }
+    }
