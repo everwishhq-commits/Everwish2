@@ -1,36 +1,29 @@
-export async function GET() {
-  const videos = [
-    {
-      title: "Pumpkin Halloween Card",
-      category: "Seasonal Holidays",
-      subcategory: "Halloween",
-      src: "/cards/pumpkin.mp4",
-    },
-    {
-      title: "Santa Christmas Card",
-      category: "Seasonal Holidays",
-      subcategory: "Christmas",
-      src: "/cards/santa.mp4",
-    },
-    {
-      title: "Romantic Love Card",
-      category: "Love & Romance",
-      subcategory: "Valentine",
-      src: "/cards/love.mp4",
-    },
-    {
-      title: "Birthday Surprise Card",
-      category: "Birthday",
-      subcategory: "Friends",
-      src: "/cards/birthday.mp4",
-    },
-    {
-      title: "Dog and Cat Card",
-      category: "Animals",
-      subcategory: "Pets",
-      src: "/cards/pets.mp4",
-    },
-  ];
+import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
-  return Response.json({ videos });
+export async function GET() {
+  const dir = path.join(process.cwd(), "public/cards");
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".mp4"));
+
+  const videos = files.map((file) => {
+    const cleanName = file.replace(".mp4", "");
+    const parts = cleanName.split("_");
+
+    // Estructura esperada: object_category_subcategory_version
+    const object = parts[0] || "unknown";
+    const category = parts[1] || "general";
+    const subcategory = parts[2] || "general";
+    const title = `${object.charAt(0).toUpperCase() + object.slice(1)} ${category.replace("-", " ")}`;
+
+    return {
+      title,
+      object,
+      category,
+      subcategory,
+      src: `/cards/${file}`,
+    };
+  });
+
+  return NextResponse.json({ videos });
 }
