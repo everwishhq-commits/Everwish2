@@ -9,7 +9,7 @@ export default function CategoryPage() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Normaliza el slug ("Love & Romance" → "love-romance")
+  // Normaliza los nombres (por ejemplo: "Love & Romance" → "love-romance")
   const normalize = (str) =>
     str?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and").trim();
 
@@ -20,31 +20,29 @@ export default function CategoryPage() {
         const data = await res.json();
         const all = data.videos || [];
 
-        // Filtrar los videos de esta categoría
+        // Filtrar los videos que correspondan a esta categoría
         const filtered = all.filter(
           (v) => normalize(v.category) === normalize(slug)
         );
 
         setVideos(filtered);
       } catch (err) {
-        console.error("❌ Error loading videos:", err);
+        console.error("⚠️ Error cargando videos:", err);
       } finally {
         setLoading(false);
       }
     }
-
     loadVideos();
   }, [slug]);
 
-  if (loading) {
-    return <p className="text-center text-gray-400 mt-10">Loading...</p>;
-  }
+  if (loading)
+    return <p className="text-center text-gray-400 mt-10">Loading videos...</p>;
 
   return (
     <main className="min-h-screen bg-[#fff5f8] text-gray-800 flex flex-col items-center py-10 px-4">
       <button
         onClick={() => router.push("/")}
-        className="mb-6 text-pink-600 hover:underline text-sm"
+        className="mb-6 text-pink-600 hover:underline"
       >
         ← Back to Home
       </button>
@@ -53,11 +51,7 @@ export default function CategoryPage() {
         {slug.replace(/-/g, " ")} Cards ✨
       </h1>
 
-      {videos.length === 0 ? (
-        <p className="text-gray-400 text-center mt-10">
-          No cards available in this category yet ✨
-        </p>
-      ) : (
+      {videos.length ? (
         <div className="flex flex-wrap justify-center gap-8 max-w-6xl">
           {videos.map((v, i) => (
             <motion.div
@@ -73,15 +67,24 @@ export default function CategoryPage() {
                 loop
                 playsInline
                 autoPlay
-                onError={(e) => (e.target.poster = "/placeholder.png")}
+                onError={(e) => {
+                  e.target.poster = "/placeholder.png";
+                }}
               />
-              <p className="text-center mt-2 text-gray-700 font-semibold truncate">
-                {v.title}
-              </p>
+              <div className="p-4 text-center">
+                <h3 className="font-semibold text-gray-700 mb-1">{v.title}</h3>
+                <p className="text-sm text-gray-500">
+                  {v.subcategory || "General"}
+                </p>
+              </div>
             </motion.div>
           ))}
         </div>
+      ) : (
+        <p className="text-gray-400 text-center mt-10">
+          No cards available in this category yet ✨
+        </p>
       )}
     </main>
   );
-}
+    }
