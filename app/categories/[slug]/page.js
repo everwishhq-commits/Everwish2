@@ -9,50 +9,57 @@ export default function CategoryPage() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Normaliza las categorías (ej: "Love & Romance" → "love-romance")
+  // Normaliza el slug ("Love & Romance" → "love-romance")
   const normalize = (str) =>
     str?.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and").trim();
 
   useEffect(() => {
-    async function load() {
+    async function loadVideos() {
       try {
         const res = await fetch("/api/videos", { cache: "no-store" });
         const data = await res.json();
         const all = data.videos || [];
 
-        // Filtrar por categoría actual
+        // Filtrar los videos de esta categoría
         const filtered = all.filter(
           (v) => normalize(v.category) === normalize(slug)
         );
+
         setVideos(filtered);
       } catch (err) {
-        console.error("Error loading category:", err);
+        console.error("❌ Error loading videos:", err);
       } finally {
         setLoading(false);
       }
     }
-    load();
+
+    loadVideos();
   }, [slug]);
 
-  if (loading)
+  if (loading) {
     return <p className="text-center text-gray-400 mt-10">Loading...</p>;
+  }
 
   return (
     <main className="min-h-screen bg-[#fff5f8] text-gray-800 flex flex-col items-center py-10 px-4">
       <button
         onClick={() => router.push("/")}
-        className="mb-6 text-pink-600 hover:underline"
+        className="mb-6 text-pink-600 hover:underline text-sm"
       >
         ← Back to Home
       </button>
 
-      <h1 className="text-3xl font-extrabold text-pink-600 mb-6 capitalize text-center">
+      <h1 className="text-3xl font-extrabold text-pink-600 mb-8 capitalize text-center">
         {slug.replace(/-/g, " ")} Cards ✨
       </h1>
 
-      <div className="flex flex-wrap justify-center gap-8 max-w-6xl">
-        {videos.length ? (
-          videos.map((v, i) => (
+      {videos.length === 0 ? (
+        <p className="text-gray-400 text-center mt-10">
+          No cards available in this category yet ✨
+        </p>
+      ) : (
+        <div className="flex flex-wrap justify-center gap-8 max-w-6xl">
+          {videos.map((v, i) => (
             <motion.div
               key={i}
               whileHover={{ scale: 1.05 }}
@@ -72,13 +79,9 @@ export default function CategoryPage() {
                 {v.title}
               </p>
             </motion.div>
-          ))
-        ) : (
-          <p className="text-gray-400 text-center mt-10">
-            No cards available in this category yet ✨
-          </p>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </main>
   );
 }
