@@ -8,23 +8,24 @@ export default function CategoriesCarousel() {
   const [search, setSearch] = useState("");
   const router = useRouter();
 
-  // Cargar categorías desde /api/videos
+  // Cargar categorías únicas desde /api/videos
   useEffect(() => {
     async function load() {
-      const res = await fetch("/api/videos");
-      const data = await res.json();
-
-      // Extraer categorías únicas
-      const unique = [
-        ...new Set(data.videos.map((v) => v.category?.trim())),
-      ].filter(Boolean);
-
-      setCategories(unique);
+      try {
+        const res = await fetch("/api/videos");
+        const data = await res.json();
+        const unique = [
+          ...new Set(data.videos.map((v) => v.category?.trim())),
+        ].filter(Boolean);
+        setCategories(unique);
+      } catch (err) {
+        console.error("Error loading categories:", err);
+      }
     }
     load();
   }, []);
 
-  // Filtrar categorías según búsqueda
+  // Filtrado en memoria
   const filtered = useMemo(
     () =>
       categories.filter((c) =>
@@ -52,7 +53,7 @@ export default function CategoriesCarousel() {
         />
       </div>
 
-      <div className="flex overflow-x-auto space-x-6 no-scrollbar px-4 pb-4 snap-x snap-mandatory">
+      <div className="flex overflow-x-auto space-x-6 px-4 pb-4 no-scrollbar snap-x snap-mandatory">
         {filtered.map((cat, i) => (
           <motion.div
             key={i}
@@ -82,4 +83,4 @@ function getEmojiForCategory(name) {
     Animals: "🐾",
   };
   return map[name] || "✨";
-                      }
+            }
