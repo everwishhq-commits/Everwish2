@@ -17,9 +17,9 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#FFDDE7" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="antialiased bg-[#FFF7F5] text-gray-800 overflow-x-hidden">
+      <body className="antialiased text-gray-800 overflow-x-hidden m-0 p-0">
         {children}
       </body>
     </html>
   );
-}
+            }
