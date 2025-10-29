@@ -1,13 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   images: {
-    domains: ["everwish.store", "everwishs-projects.vercel.app"],
+    domains: ["localhost", "everwish.store", "vercel.app"],
   },
-  eslint: {
-    ignoreDuringBuilds: true,
+  experimental: {
+    appDir: true,
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
