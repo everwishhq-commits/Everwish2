@@ -9,4 +9,5 @@ const nextConfig = {
   },
 };
 
+// 🚨 En proyectos con "type": "module", debes usar `export default`
 export default nextConfig;
