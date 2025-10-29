@@ -6,17 +6,16 @@ export default function Splash({ onFinish }) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Incrementa progresivamente hasta 100%
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
           setTimeout(() => {
             if (typeof onFinish === "function") onFinish();
-          }, 500); // Pequeña pausa antes de entrar al sitio
+          }, 600);
           return 100;
         }
-        return prev + 4; // Velocidad de carga
+        return prev + 5;
       });
     }, 100);
 
@@ -24,20 +23,21 @@ export default function Splash({ onFinish }) {
   }, [onFinish]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-white text-gray-700">
-      {/* Logo */}
-      <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center h-screen w-full bg-white text-gray-700">
+      {/* Contenedor central */}
+      <div className="flex flex-col items-center justify-center text-center">
+        {/* Logo */}
         <Image
           src="/logo.png"
           alt="Everwish Logo"
           width={180}
           height={180}
           priority
-          className="select-none"
+          className="select-none mb-6"
         />
 
         {/* Barra de carga */}
-        <div className="w-56 h-3 bg-gray-200 rounded-full overflow-hidden mt-6">
+        <div className="w-56 h-3 bg-gray-200 rounded-full overflow-hidden mb-3">
           <div
             className="h-full bg-pink-500 transition-all duration-200 ease-in-out"
             style={{ width: `${progress}%` }}
@@ -45,15 +45,11 @@ export default function Splash({ onFinish }) {
         </div>
 
         {/* Porcentaje */}
-        <p className="mt-2 text-sm font-medium text-gray-500">
-          {progress}%
-        </p>
+        <p className="text-sm font-medium text-gray-600">{progress}%</p>
 
-        {/* Texto inferior */}
-        <p className="mt-4 text-gray-400 text-sm">
-          Preparing your wishes…
-        </p>
+        {/* Texto */}
+        <p className="mt-3 text-gray-400 text-sm">Preparing your wishes…</p>
       </div>
     </div>
   );
-}
+        }
