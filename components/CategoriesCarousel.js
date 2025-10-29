@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import "swiper/css";
 
-// ✅ 6 categorías finales
 const CATEGORIES = [
   {
     name: "Holidays",
@@ -15,10 +14,15 @@ const CATEGORIES = [
     slug: "holidays",
     color: "#FFF4E0",
     keywords: [
-      "christmas","xmas","thanksgiving","newyear","new year",
-      "july4th","4th of july","independenceday","independence",
-      "easter","halloween","hanukkah","st patrick","st. patrick","stpatricks",
-      "oktoberfest","labor day","memorial day","veterans day","mlk day"
+      "christmas","xmas","newyear","new year","thanksgiving","easter","halloween",
+      "independence","independence day","valentine","valentine's","hanukkah",
+      "st patrick","st. patrick","oktoberfest","labor day","memorial day",
+      "veterans day","mlk day","holiday","celebration"
+    ],
+    subcategories: [
+      "Christmas","New Year","Thanksgiving","Easter","Halloween",
+      "Valentine's Day","Independence Day","Hanukkah","Labor Day","Memorial Day",
+      "Veterans Day","St. Patrick's Day"
     ],
   },
   {
@@ -26,35 +30,73 @@ const CATEGORIES = [
     emoji: "❤️",
     slug: "love",
     color: "#FFE8EE",
-    keywords: ["love","romance","romantic","valentine","valentine's","anniversary","wedding","engagement","proposal","couple","hugs","kiss"],
+    keywords: [
+      "love","romance","romantic","valentine","wedding","engagement","anniversary",
+      "proposal","couple","relationship","heart","hug","kiss","breakup","self love"
+    ],
+    subcategories: [
+      "Romance","Anniversary","Wedding","Engagement","Proposal","Couples",
+      "Hugs & Kisses","Relationships","Self Love","Long Distance"
+    ],
   },
   {
     name: "Celebrations",
     emoji: "🎉",
     slug: "celebrations",
     color: "#FFF7FF",
-    keywords: ["birthday","bday","graduation","congrats","congratulations","mothers-day","mother's day","fathers-day","father's day","babyshower","newborn","party"],
+    keywords: [
+      "birthday","bday","graduation","congratulations","congrats","babyshower",
+      "baby shower","newborn","retirement","achievement","promotion","milestone",
+      "success","party","celebrate"
+    ],
+    subcategories: [
+      "Birthday","Graduation","Congratulations","Baby Shower","Newborn",
+      "Retirement","Achievement","Promotion","Success","Milestones"
+    ],
   },
   {
     name: "Animals & Nature",
     emoji: "🐾",
     slug: "animals-nature",
     color: "#E8FFF3",
-    keywords: ["pets","pet","animals","dog","cat","dogcat","yeti","eagle","turtle","nature","wildlife"],
+    keywords: [
+      "pet","pets","animal","animals","dog","cat","bird","horse","elephant",
+      "turtle","wildlife","nature","forest","flowers","yeti","fantasy"
+    ],
+    subcategories: [
+      "Pets","Cats","Dogs","Birds","Horses","Elephants","Turtles","Yeti",
+      "Fantasy Creatures","Wildlife","Nature","Flowers"
+    ],
   },
   {
     name: "Seasons",
     emoji: "🍂",
     slug: "seasons",
     color: "#E8F3FF",
-    keywords: ["summer","spring","autumn","fall","winter","seasonal"],
+    keywords: [
+      "season","summer","spring","autumn","fall","winter","vacation","travel",
+      "adventure","weather","seasonal","season greetings"
+    ],
+    subcategories: [
+      "Summer","Spring","Autumn","Fall","Winter","Season Greetings","Vacation",
+      "Travel","Adventure"
+    ],
   },
   {
     name: "Family & Friends",
     emoji: "👨‍👩‍👧‍👦",
     slug: "family-friends",
     color: "#E5EDFF",
-    keywords: ["family","friend","friendship","mom","mother","dad","father","siblings","bestie","bff"],
+    keywords: [
+      "family","mom","mother","dad","father","parents","grandparents","sister",
+      "brother","siblings","friend","friends","best friend","bff","support",
+      "thank you","get well","condolence","condolences","sympathy","remembrance",
+      "memory","loss","grief","healing","comfort","love ones","missing you"
+    ],
+    subcategories: [
+      "Mom","Dad","Parents","Grandparents","Siblings","Best Friends","Friendship",
+      "Support","Condolences","Sympathy","Remembrance","Get Well Soon","Thank You"
+    ],
   },
 ];
 
@@ -62,39 +104,42 @@ export default function CategoriesCarousel() {
   const [search, setSearch] = useState("");
   const [filtered, setFiltered] = useState(CATEGORIES);
 
-  // 🔍 Busca por nombre de categoría o por keywords
+  // 🔍 Filtrado de categorías y subcategorías
   useEffect(() => {
     const q = search.toLowerCase().trim();
     if (!q) {
       setFiltered(CATEGORIES);
       return;
     }
-    const result = CATEGORIES.filter(
+
+    const matches = CATEGORIES.filter(
       (c) =>
         c.name.toLowerCase().includes(q) ||
+        (c.subcategories && c.subcategories.some((s) => s.toLowerCase().includes(q))) ||
         (c.keywords && c.keywords.some((k) => k.toLowerCase().includes(q)))
     );
-    setFiltered(result);
+
+    setFiltered(matches);
   }, [search]);
 
   return (
-    <section id="categories" className="text-center py-8 px-3 overflow-hidden">
+    <section id="categories" className="text-center py-10 px-3 overflow-hidden">
       <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">
-        Categories
+        Explore by Category ✨
       </h2>
 
       {/* 🔎 Search bar */}
-      <div className="flex justify-center mb-8">
+      <div className="flex justify-center mb-10">
         <input
           type="text"
-          placeholder="Search — e.g. halloween, valentine, birthday…"
+          placeholder="Search — e.g. birthday, love, condolences..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-80 md:w-96 px-4 py-2 rounded-full border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 text-gray-700"
         />
       </div>
 
-      {/* 🎠 Swiper carousel */}
+      {/* 🎠 Carousel */}
       <Swiper
         slidesPerView={3.2}
         spaceBetween={16}
@@ -103,16 +148,16 @@ export default function CategoriesCarousel() {
         autoplay={{ delay: 2500, disableOnInteraction: false }}
         speed={1000}
         breakpoints={{
-          0: { slidesPerView: 2.3, spaceBetween: 10 },
-          640: { slidesPerView: 3.5, spaceBetween: 14 },
+          0: { slidesPerView: 2.4, spaceBetween: 10 },
+          640: { slidesPerView: 3.4, spaceBetween: 14 },
           1024: { slidesPerView: 5, spaceBetween: 18 },
         }}
         modules={[Autoplay]}
         className="overflow-visible"
       >
-        {filtered.length ? (
-          filtered.map((cat) => (
-            <SwiperSlide key={cat.slug}>
+        {filtered.length > 0 ? (
+          filtered.map((cat, i) => (
+            <SwiperSlide key={i}>
               <Link href={`/categories/${cat.slug}`}>
                 <motion.div
                   className="flex flex-col items-center justify-center cursor-pointer"
@@ -125,7 +170,11 @@ export default function CategoriesCarousel() {
                     <motion.span
                       className="text-4xl sm:text-5xl"
                       animate={{ y: [0, -5, 0] }}
-                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
                     >
                       {cat.emoji}
                     </motion.span>
@@ -145,4 +194,4 @@ export default function CategoriesCarousel() {
       </Swiper>
     </section>
   );
-    }
+          }
