@@ -2,16 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
 body {
-  font-family: 'Poppins', 'Montserrat', sans-serif;
-  background-color: #FFF7F5;
-  color: #3b2b1f;
   margin: 0;
   padding: 0;
+  width: 100%;
+  height: 100%;
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
 }
 
-html {
-  scroll-behavior: smooth;
+body {
+  font-family: 'Poppins', 'Montserrat', sans-serif;
+  color: #3b2b1f;
+  -webkit-font-smoothing: antialiased;
+  /* 🔸 Quitamos el fondo aquí, el splash ya usa fondo blanco */
 }
