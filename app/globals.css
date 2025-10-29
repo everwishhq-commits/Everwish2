@@ -2,19 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-}
-
+/* 🎨 Estilos globales Everwish */
 body {
   font-family: 'Poppins', 'Montserrat', sans-serif;
   color: #3b2b1f;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  /* 🔸 Quitamos el fondo aquí, el splash ya usa fondo blanco */
+}
+
+/* 🌸 Fondo pastel Everwish — lo aplicamos dinámicamente desde Page.js,
+   no aquí, para que el splash se mantenga blanco y centrado */
+html {
+  scroll-behavior: smooth;
+  background-color: #ffffff;
+}
+
+/* ✨ Botones con efecto Everwish */
+button {
+  transition: all 0.25s ease-in-out;
+}
+
+button:active {
+  transform: scale(0.97);
 }
