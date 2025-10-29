@@ -2,68 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 🎨 Estilos globales Everwish */
-html, body {
+body {
   font-family: 'Poppins', 'Montserrat', sans-serif;
-  background: linear-gradient(to bottom, #fff5f7 0%, #fff8f9 50%, #ffffff 100%);
+  background-color: #FFF7F5;
   color: #3b2b1f;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+}
+
+html {
   scroll-behavior: smooth;
-}
-
-/* 🌸 Scrollbar invisible (para carruseles horizontales) */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* ✨ Botones con efecto Everwish */
-button {
-  transition: all 0.25s ease-in-out;
-  border-radius: 0.75rem;
-  font-weight: 500;
-}
-button:active {
-  transform: scale(0.97);
-}
-
-/* 💫 Tarjetas generales */
-.card {
-  background-color: #fff;
-  border: 1px solid #ffd6e1;
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 10px rgba(255, 182, 193, 0.25);
-  transition: all 0.3s ease;
-}
-.card:hover {
-  background-color: #fff0f5;
-  transform: translateY(-3px);
-}
-
-/* 🩷 Encabezados Everwish */
-h1, h2, h3 {
-  color: #e26a93;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-/* 🕊️ Footer suave */
-footer {
-  background-color: #fff7f9;
-  border-top: 1px solid #ffd6e1;
-  padding: 2rem 0;
-  text-align: center;
-  font-size: 0.9rem;
-  color: #7a6b61;
-}
-
-/* 🌈 Transiciones suaves */
-a, video, img {
-  transition: all 0.3s ease-in-out;
 }
