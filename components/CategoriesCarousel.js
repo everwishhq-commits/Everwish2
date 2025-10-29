@@ -7,109 +7,112 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import "swiper/css";
 
-const allCategories = [
-  { name: "Holidays", emoji: "🎄", slug: "holidays", color: "#FFF4E0" },
-  { name: "Love & Romance", emoji: "❤️", slug: "love", color: "#FFE8E8" },
-  { name: "Celebrations", emoji: "🎉", slug: "celebrations", color: "#FFF7FF" },
-  { name: "Animals & Nature", emoji: "🐾", slug: "animals", color: "#E8FFF3" },
-  { name: "Appreciation & Support", emoji: "💌", slug: "appreciation", color: "#FDE6E6" },
-  { name: "Kids & Family", emoji: "🧸", slug: "family", color: "#FFE6FA" },
+// ✅ 6 categorías finales
+const CATEGORIES = [
+  {
+    name: "Holidays",
+    emoji: "🎄",
+    slug: "holidays",
+    color: "#FFF4E0",
+    keywords: [
+      "christmas","xmas","thanksgiving","newyear","new year",
+      "july4th","4th of july","independenceday","independence",
+      "easter","halloween","hanukkah","st patrick","st. patrick","stpatricks",
+      "oktoberfest","labor day","memorial day","veterans day","mlk day"
+    ],
+  },
+  {
+    name: "Love",
+    emoji: "❤️",
+    slug: "love",
+    color: "#FFE8EE",
+    keywords: ["love","romance","romantic","valentine","valentine's","anniversary","wedding","engagement","proposal","couple","hugs","kiss"],
+  },
+  {
+    name: "Celebrations",
+    emoji: "🎉",
+    slug: "celebrations",
+    color: "#FFF7FF",
+    keywords: ["birthday","bday","graduation","congrats","congratulations","mothers-day","mother's day","fathers-day","father's day","babyshower","newborn","party"],
+  },
+  {
+    name: "Animals & Nature",
+    emoji: "🐾",
+    slug: "animals-nature",
+    color: "#E8FFF3",
+    keywords: ["pets","pet","animals","dog","cat","dogcat","yeti","eagle","turtle","nature","wildlife"],
+  },
+  {
+    name: "Seasons",
+    emoji: "🍂",
+    slug: "seasons",
+    color: "#E8F3FF",
+    keywords: ["summer","spring","autumn","fall","winter","seasonal"],
+  },
+  {
+    name: "Family & Friends",
+    emoji: "👨‍👩‍👧‍👦",
+    slug: "family-friends",
+    color: "#E5EDFF",
+    keywords: ["family","friend","friendship","mom","mother","dad","father","siblings","bestie","bff"],
+  },
 ];
 
 export default function CategoriesCarousel() {
   const [search, setSearch] = useState("");
-  const [filtered, setFiltered] = useState(allCategories);
-  const [videos, setVideos] = useState([]);
+  const [filtered, setFiltered] = useState(CATEGORIES);
 
-  // 📥 Cargar videos reales desde el API
-  useEffect(() => {
-    async function loadVideos() {
-      try {
-        const res = await fetch("/api/videos", { cache: "no-store" });
-        const data = await res.json();
-        setVideos(data.videos || []);
-      } catch (err) {
-        console.error("❌ Error cargando /api/videos:", err);
-      }
-    }
-    loadVideos();
-  }, []);
-
-  // 🔍 Buscar coincidencias
+  // 🔍 Busca por nombre de categoría o por keywords
   useEffect(() => {
     const q = search.toLowerCase().trim();
     if (!q) {
-      setFiltered(allCategories);
+      setFiltered(CATEGORIES);
       return;
     }
-
-    const foundCategories = new Set();
-
-    videos.forEach((item) => {
-      const searchableText = [
-        item.mainName,
-        item.combinedName,
-        item.category,
-        item.subcategory,
-        item.object,
-        item.title,
-      ]
-        .join(" ")
-        .toLowerCase();
-
-      if (searchableText.includes(q)) {
-        foundCategories.add(item.mainSlug || item.category);
-      }
-    });
-
-    const matches = allCategories.filter((cat) =>
-      [...foundCategories].some((f) =>
-        f.toLowerCase().includes(cat.slug.toLowerCase())
-      )
+    const result = CATEGORIES.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        (c.keywords && c.keywords.some((k) => k.toLowerCase().includes(q)))
     );
-
-    setFiltered(matches.length > 0 ? matches : []);
-  }, [search, videos]);
+    setFiltered(result);
+  }, [search]);
 
   return (
-    <section id="categories" className="text-center py-10 px-3 overflow-hidden">
+    <section id="categories" className="text-center py-8 px-3 overflow-hidden">
       <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">
-        Explore by Category ✨
+        Categories
       </h2>
 
-      {/* 🔎 Barra de búsqueda */}
-      <div className="flex justify-center mb-10">
+      {/* 🔎 Search bar */}
+      <div className="flex justify-center mb-8">
         <input
           type="text"
-          placeholder="Search any theme — e.g. love, new year, turtle..."
+          placeholder="Search — e.g. halloween, valentine, birthday…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-80 md:w-96 px-4 py-2 rounded-full border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 text-gray-700"
         />
       </div>
 
-      {/* 🎠 Carrusel de categorías */}
+      {/* 🎠 Swiper carousel */}
       <Swiper
         slidesPerView={3.2}
         spaceBetween={16}
-        centeredSlides={true}
-        loop={true}
-        autoplay={{
-          delay: 2500,
-          disableOnInteraction: false,
-        }}
+        centeredSlides
+        loop
+        autoplay={{ delay: 2500, disableOnInteraction: false }}
         speed={1000}
         breakpoints={{
           0: { slidesPerView: 2.3, spaceBetween: 10 },
-          640: { slidesPerView: 3.4, spaceBetween: 14 },
+          640: { slidesPerView: 3.5, spaceBetween: 14 },
           1024: { slidesPerView: 5, spaceBetween: 18 },
         }}
         modules={[Autoplay]}
         className="overflow-visible"
       >
-        {filtered.length > 0 ? (
-          filtered.map((cat, i) => (
-            <SwiperSlide key={i}>
+        {filtered.length ? (
+          filtered.map((cat) => (
+            <SwiperSlide key={cat.slug}>
               <Link href={`/categories/${cat.slug}`}>
                 <motion.div
                   className="flex flex-col items-center justify-center cursor-pointer"
@@ -122,11 +125,7 @@ export default function CategoriesCarousel() {
                     <motion.span
                       className="text-4xl sm:text-5xl"
                       animate={{ y: [0, -5, 0] }}
-                      transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                     >
                       {cat.emoji}
                     </motion.span>
@@ -146,4 +145,4 @@ export default function CategoriesCarousel() {
       </Swiper>
     </section>
   );
-}
+    }
